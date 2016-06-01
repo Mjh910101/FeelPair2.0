@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <color name="activity_bg">#f6f2e6</color>
+    <color name="line_gray">#dad6cc</color>
+    <color name="lucency">#00FFFFFF</color>
+    <color name="whitle">#FFFFFF</color>
+    <color name="black">#000000</color>
+    <color name="text_gray_01">#999999</color>
+    <color name="text_gray_02">#666666</color>
+    <color name="text_gray_03">#333333</color>
+    <color name="woman">#ffadc4</color>
+    <color name="man">#00c8fc</color>
+    <color name="red">#FF0000</color>
+    <color name="yellow">#e5ce30</color>
+
+</resources>
