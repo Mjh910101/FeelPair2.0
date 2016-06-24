@@ -73,10 +73,10 @@ public class PeopleAdapter extends BaseAdapter {
     public void addPeople(People obj) {
         if (obj.isMan()) {
             manList.add(obj);
-            manMap.put(obj.getId(), obj);
+            manMap.put(obj.getNumber(), obj);
         } else {
             womanList.add(obj);
-            womanMap.put(obj.getId(), obj);
+            womanMap.put(obj.getNumber(), obj);
         }
         refreshPeopleList(manList, womanList);
     }
@@ -109,10 +109,10 @@ public class PeopleAdapter extends BaseAdapter {
     private void deleteItem(People obj) {
         if (obj.isMan()) {
             manList.remove(obj);
-            manMap.remove(obj.getId());
+            manMap.remove(obj.getNumber());
         } else {
             womanList.remove(obj);
-            womanMap.remove(obj.getId());
+            womanMap.remove(obj.getNumber());
         }
         refreshPeopleList(manList, womanList);
     }
@@ -161,14 +161,14 @@ public class PeopleAdapter extends BaseAdapter {
             for (int id : obj.getChooseIdList()) {
                 if (obj.isMan()) {
                     if (womanMap.containsKey(id)) {
-                        if (womanMap.get(id).isChooseId(obj.getId())) {
-                            sb.append(obj.getIdText() + " 与 " + womanMap.get(id).getIdText() + " 配对成功" + "\n");
+                        if (womanMap.get(id).isChooseId(obj.getNumber())) {
+                            sb.append(obj.getNumberText() + " 与 " + womanMap.get(id).getNumberText() + " 配对成功" + "\n");
                         }
                     }
                 } else {
                     if (manMap.containsKey(id)) {
-                        if (manMap.get(id).isChooseId(obj.getId())) {
-                            sb.append(obj.getIdText() + " 与 " + manMap.get(id).getIdText() + " 配对成功" + "\n");
+                        if (manMap.get(id).isChooseId(obj.getNumber())) {
+                            sb.append(obj.getNumberText() + " 与 " + manMap.get(id).getNumberText() + " 配对成功" + "\n");
                         }
                     }
                 }
@@ -257,7 +257,7 @@ public class PeopleAdapter extends BaseAdapter {
                 } else {
                     StringBuffer sb = new StringBuffer();
                     for (People obj : list) {
-                        sb.append(obj.getIdText());
+                        sb.append(obj.getNumberText());
                         sb.append(" , ");
                     }
                     showChoosePeopleLisrDialog(sb.toString());
@@ -283,7 +283,7 @@ public class PeopleAdapter extends BaseAdapter {
     private List<People> getChooseItPeopleList(List<People> peopleList, People obj) {
         List<People> list = new ArrayList<>();
         for (People p : peopleList) {
-            if (p.isChooseId(obj.getId())) {
+            if (p.isChooseId(obj.getNumber())) {
                 list.add(p);
             }
         }
@@ -330,7 +330,7 @@ public class PeopleAdapter extends BaseAdapter {
     }
 
     private void setView(HolderView holder, People obj) {
-        holder.peopleId.setText(obj.getIdText());
+        holder.peopleId.setText(obj.getNumberText());
         holder.chooseId.setText(obj.getChooseText());
         holder.sumText.setText(obj.getSumText());
 

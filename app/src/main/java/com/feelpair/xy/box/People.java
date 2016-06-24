@@ -4,6 +4,10 @@ import android.content.Context;
 
 import com.feelpair.xy.R;
 import com.feelpair.xy.handlers.ColorHandler;
+import com.lidroid.xutils.db.annotation.Column;
+import com.lidroid.xutils.db.annotation.Id;
+import com.lidroid.xutils.db.annotation.Table;
+import com.lidroid.xutils.db.annotation.Transient;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,19 +33,41 @@ import java.util.List;
  * *   ┗┻┛   ┗┻┛
  * Created by Hua on 16/4/27.
  */
+@Table(name = "tbl_people")
 public class People implements Comparable {
 
     public final static boolean MAN = true;
     public final static boolean WOMAN = false;
 
-    private int id;
+    @Id(column = "object_id")
+    private String objectId;
+
+    @Column(column = "number")
+    private int number;
+
+    @Transient
     private int sum;
+
+    @Column(column = "gender")
     private boolean gender;
+
+    @Transient
     private List<Integer> chooseIdList;
 
-    public People(int id, boolean gender) {
-        this.id = id;
+    @Column(column = "chooseIds")
+    private String chooseIds;
+
+    public People() {
+        initObject();
+    }
+
+    public People(int number, boolean gender) {
+        this.number = number;
         this.gender = gender;
+        initObject();
+    }
+
+    private void initObject() {
         this.chooseIdList = new ArrayList<Integer>();
         this.sum = 0;
     }
@@ -65,9 +91,9 @@ public class People implements Comparable {
         sum = 0;
     }
 
-    public String getIdText() {
+    public String getNumberText() {
         StringBuffer sb = new StringBuffer();
-        sb.append(id + "号 ");
+        sb.append(number + "号 ");
         if (isMan()) {
             sb.append("先生");
         } else {
@@ -84,8 +110,8 @@ public class People implements Comparable {
         return sb.toString();
     }
 
-    public int getId() {
-        return id;
+    public int getNumber() {
+        return number;
     }
 
     public boolean isMan() {
@@ -128,8 +154,8 @@ public class People implements Comparable {
         return list;
     }
 
-    public boolean equals(int peopleId) {
-        return id == peopleId;
+    public boolean equals(int peopleNumber) {
+        return number == peopleNumber;
     }
 
     public boolean equals(boolean gender) {
@@ -139,7 +165,7 @@ public class People implements Comparable {
     @Override
     public String toString() {
         StringBuffer sb = new StringBuffer();
-        sb.append(getIdText());
+        sb.append(getNumberText());
         sb.append("，选择了 ");
         sb.append(getChooseText());
         sb.append("。");
@@ -157,7 +183,7 @@ public class People implements Comparable {
     @Override
     public int compareTo(Object obj) {
         People p = (People) obj;
-        return this.getId() - p.getId();
+        return this.getNumber() - p.getNumber();
     }
 
 
@@ -167,5 +193,55 @@ public class People implements Comparable {
 
     public List<Integer> getChooseIdList() {
         return chooseIdList;
+    }
+
+    public String getObjectId() {
+        if (objectId == null || objectId.equals("")) {
+            if (isMan()) {
+                return "M_" + getNumber();
+            } else {
+                return "W_" + getNumber();
+            }
+        }
+        return objectId;
+    }
+
+    public void setObjectId(String objectId) {
+        this.objectId = objectId;
+    }
+
+    public void setNumber(int number) {
+        this.number = number;
+    }
+
+    public boolean isGender() {
+        return gender;
+    }
+
+    public void setGender(boolean gender) {
+        this.gender = gender;
+    }
+
+    public String getChooseIds() {
+        StringBuffer sb = new StringBuffer();
+        for (int id : chooseIdList) {
+            sb.append(id);
+            sb.append("@");
+        }
+        return sb.toString().substring(0, sb.length() - 1);
+    }
+
+    public void setChooseIds(String chooseIds) {
+        String[] ids = chooseIds.split("@");
+        if (chooseIdList == null) {
+            chooseIdList = new ArrayList<>();
+        }
+        for (String id : ids) {
+            try {
+                chooseIdList.add(Integer.valueOf(id));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
 }

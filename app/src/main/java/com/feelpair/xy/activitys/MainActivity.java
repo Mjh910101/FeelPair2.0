@@ -15,12 +15,15 @@ import android.widget.TextView;
 import com.feelpair.xy.R;
 import com.feelpair.xy.adapters.PeopleAdapter;
 import com.feelpair.xy.box.People;
+import com.feelpair.xy.dao.DBHandler;
 import com.feelpair.xy.dialogs.ListDialog;
 import com.feelpair.xy.dialogs.MessageDialog;
 import com.feelpair.xy.handlers.ColorHandler;
 import com.feelpair.xy.handlers.MessageHandler;
 import com.feelpair.xy.handlers.TextHandeler;
+import com.lidroid.xutils.DbUtils;
 import com.lidroid.xutils.ViewUtils;
+import com.lidroid.xutils.exception.DbException;
 import com.lidroid.xutils.view.annotation.ViewInject;
 import com.lidroid.xutils.view.annotation.event.OnClick;
 
@@ -54,7 +57,7 @@ public class MainActivity extends BaseActivity {
 
     private boolean gender = People.MAN;
 
-    private static PeopleAdapter mPeopleAdapter = null;
+    private PeopleAdapter mPeopleAdapter = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,12 +69,23 @@ public class MainActivity extends BaseActivity {
 
     private void initActivity() {
         setGender(People.MAN);
+        initPeopleAdapter();
+    }
 
-        if (mPeopleAdapter == null) {
-            mPeopleAdapter = new PeopleAdapter();
-        }
+    private void initPeopleAdapter() {
+        mPeopleAdapter = new PeopleAdapter();
         mPeopleAdapter.setAdapterContext(context);
         dataList.setAdapter(mPeopleAdapter);
+        try {
+            List<People> list = DBHandler.getDbUtils(context).findAll(People.class);
+            if (list != null) {
+                for (People obj : list) {
+                    mPeopleAdapter.addPeople(obj);
+                }
+            }
+        } catch (DbException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -113,9 +127,10 @@ public class MainActivity extends BaseActivity {
         dialog.setItemListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                dialog.dismiss();
                 switch (CINTROL[position]) {
                     case QINGKONG:
-                        mPeopleAdapter.removeAll();
+                        showDlelteDialog();
                         break;
                     case TONGJI:
                         mPeopleAdapter.statisticsPeopleSum();
@@ -124,16 +139,35 @@ public class MainActivity extends BaseActivity {
                         showCooperateDialog(mPeopleAdapter.getCooperateText());
                         break;
                 }
-                dialog.dismiss();
+            }
+        });
+    }
+
+    private void showDlelteDialog() {
+        MessageDialog dialog = new MessageDialog(context);
+        dialog.setMessage("是否清空所有参加者信息？");
+        dialog.setCancelStyle("取消");
+        dialog.setCancelListener(null);
+        dialog.setCommitStyle("清空");
+        dialog.setCommitListener(new MessageDialog.CallBackListener() {
+            @Override
+            public void callback() {
+                DbUtils db = DBHandler.getDbUtils(context);
+                try {
+                    db.deleteAll(db.findAll(People.class));
+                    mPeopleAdapter.removeAll();
+                } catch (DbException e) {
+                    e.printStackTrace();
+                }
             }
         });
     }
 
     private void showCooperateDialog(String text) {
         MessageDialog dialog = new MessageDialog(context);
-        if(text.equals("")){
+        if (text.equals("")) {
             dialog.setMessage("没有配对成功的结果");
-        }else{
+        } else {
             dialog.setMessage(text);
             dialog.setLayout(0.8, 0.5);
         }
@@ -149,7 +183,7 @@ public class MainActivity extends BaseActivity {
         int peopleId = getPeopleId();
         int chooseId = getChooseId();
         boolean peopleGender = getGender();
-        if(peopleId<0||chooseId<0){
+        if (peopleId < 0 || chooseId < 0) {
             MessageHandler.showToast(context, "信息有误，请重新填写!");
             return;
         }
@@ -160,17 +194,32 @@ public class MainActivity extends BaseActivity {
                 return;
             }
         } else {
-            mPeopleAdapter.addPeople(createPeople(peopleId, peopleGender, chooseId));
+            people = createPeople(peopleId, peopleGender, chooseId);
+            mPeopleAdapter.addPeople(people);
         }
+        savePeople(people);
         mPeopleAdapter.initPeopleSum();
         mPeopleAdapter.notifyDataSetChanged();
         cleanInput();
+    }
+
+    private void savePeople(People people) {
+        try {
+            DBHandler.getDbUtils(context).saveOrUpdate(people);
+        } catch (DbException e) {
+            e.printStackTrace();
+        }
     }
 
 
     private People createPeople(int peopleId, boolean peopleGender, int chooseId) {
         People obj = new People(peopleId, peopleGender);
         obj.addChooseId(chooseId);
+        try {
+            DBHandler.getDbUtils(context).save(obj);
+        } catch (DbException e) {
+            e.printStackTrace();
+        }
         return obj;
     }
 
