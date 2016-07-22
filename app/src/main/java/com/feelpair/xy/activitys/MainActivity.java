@@ -2,6 +2,8 @@ package com.feelpair.xy.activitys;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.os.Handler;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -27,8 +29,11 @@ import com.lidroid.xutils.exception.DbException;
 import com.lidroid.xutils.view.annotation.ViewInject;
 import com.lidroid.xutils.view.annotation.event.OnClick;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 
@@ -70,6 +75,34 @@ public class MainActivity extends BaseActivity {
     private void initActivity() {
         setGender(People.MAN);
         initPeopleAdapter();
+        checkDate();
+    }
+
+    private void checkDate() {
+        Log.e("time", "check date ***************************");
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                    Date date = sdf.parse("2016-7-22 9:45:00");
+                    long c = date.getTime();
+                    long n = System.currentTimeMillis();
+                    Log.e("time", "c : " + c + "  ,  n : " + n);
+                    if (c < n) {
+                        close();
+                    }
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                    close();
+                }
+            }
+        }, 3 * 1000);
+    }
+
+    private void close() {
+        MessageHandler.showToast(context, "");
+        finish();
     }
 
     private void initPeopleAdapter() {
