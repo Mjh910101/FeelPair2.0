@@ -22,6 +22,7 @@ import com.feelpair.xy.dialogs.ListDialog;
 import com.feelpair.xy.dialogs.MessageDialog;
 import com.feelpair.xy.handlers.ColorHandler;
 import com.feelpair.xy.handlers.MessageHandler;
+import com.feelpair.xy.handlers.SystemHandle;
 import com.feelpair.xy.handlers.TextHandeler;
 import com.lidroid.xutils.DbUtils;
 import com.lidroid.xutils.ViewUtils;
@@ -85,11 +86,11 @@ public class MainActivity extends BaseActivity {
             public void run() {
                 try {
                     SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                    Date date = sdf.parse("2016-7-22 9:45:00");
+                    Date date = sdf.parse("2016-8-20 12:12:12");
                     long c = date.getTime();
                     long n = System.currentTimeMillis();
                     Log.e("time", "c : " + c + "  ,  n : " + n);
-                    if (c < n) {
+                    if (c < n || SystemHandle.getBoolean(context, CLOSE)) {
                         close();
                     }
                 } catch (ParseException e) {
@@ -100,8 +101,11 @@ public class MainActivity extends BaseActivity {
         }, 3 * 1000);
     }
 
+    private final static String CLOSE = "close";
+
     private void close() {
-        MessageHandler.showToast(context, "");
+        SystemHandle.saveBooleanMessage(context, CLOSE, true);
+        MessageHandler.showToast(context, "请使用正版!");
         finish();
     }
 

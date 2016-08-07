@@ -1,6 +1,7 @@
 package com.feelpair.xy.adapters;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -242,6 +243,7 @@ public class PeopleAdapter extends BaseAdapter {
         initScroll(convertView, holder);
         People obj = peopleList.get(position);
         setView(holder, obj);
+        setOnSumText(holder.sumText, obj);
         serOnDeleteBotton(holder.deleteBtn, obj);
         serOnStatisticalBotton(holder.statisticalBtn, obj);
         return convertView;
@@ -339,6 +341,26 @@ public class PeopleAdapter extends BaseAdapter {
         } else {
             holder.peopleId.setTextColor(People.getWomanColor(context));
         }
+    }
+
+    public void setOnSumText(TextView view, final People obj) {
+        view.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                List<People> list = getChooseItPeopleList(obj);
+                if (list != null) {
+                    StringBuffer sb = new StringBuffer();
+                    for (People p : list) {
+                        sb.append(p.getNumberText());
+                        sb.append(" ; ");
+                    }
+                    if (sb.length() > 3) {
+                        showChoosePeopleLisrDialog(sb.toString().substring(0, sb.length() - 2));
+                    }
+
+                }
+            }
+        });
     }
 
     class HolderView {
